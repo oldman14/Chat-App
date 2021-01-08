@@ -20,7 +20,7 @@ export default function Login({navigation}) {
     // console.log(user);
     // console.log(user.email);
     // if (initialRouteName) setInitializing(false);
-    // if (!isAuth) setIsAuth(true);
+    if (!isAuth) setIsAuth(true);
   };
 
   useEffect(() => {

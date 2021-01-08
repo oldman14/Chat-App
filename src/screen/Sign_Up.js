@@ -23,9 +23,11 @@ const Sign_up = () => {
       .createUserWithEmailAndPassword(email, password)
       .then(() => {
         const userAuth = auth().currentUser;
-        database()
-          .ref(`/user/${userAuth.uid}`)
-          .set({email: userAuth.email, uid: userAuth.uid});
+        database().ref(`/user/${userAuth.uid}`).set({
+          email: userAuth.email,
+          uid: userAuth.uid,
+          userName: cfPassword,
+        });
         ToastAndroid.show('Đăng ký thành công', ToastAndroid.LONG);
         console.log('User account crea ted & signed in!');
       })
@@ -102,7 +104,7 @@ const Sign_up = () => {
             fontSize: 18,
           }}></FloatingLabelInput>
         <FloatingLabelInput
-          label="Confirm Password"
+          label="Username"
           value={cfPassword}
           hintTextColor={'white'}
           onChangeText={(val) => setCfPassword(val)}
