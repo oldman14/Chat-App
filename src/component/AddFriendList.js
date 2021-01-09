@@ -1,10 +1,12 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 
 const AddFriendList = (props) => {
   const friendList = props.friendList;
-  console.log('Log add: ' + friendList);
+  // console.log('Log add: ' + friendList);
   const onClick = () => {
     console.log(friendList.userName);
   };
@@ -31,7 +33,7 @@ const AddFriendList = (props) => {
     </View>
   );
 };
-
+//cmt
 export default AddFriendList;
 
 const styles = StyleSheet.create({

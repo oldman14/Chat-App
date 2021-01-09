@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import ChatListItem from '../../component/ChatListItem';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 
 const ChatRoomScreen = ({navigation}) => {
   const DATA = [
@@ -117,29 +119,46 @@ const ChatRoomScreen = ({navigation}) => {
       },
     },
   ];
+  const [chatRoom, setChatRoom] = useState([]);
+  const user = auth().currentUser.uid;
+  console.log(user + 'Log user');
+
+  useEffect(() => {
+    const onValueChange = database()
+      .ref(`/chatRoom/${user}`)
+      .on('value', (snapshot) => {
+        let items = [];
+        snapshot.forEach((element) => {
+          // console.log('Clg user', element.val().user);
+          let item = {
+            _key: element.key,
+            userName: element.val().user.name,
+            image: element.val().user.imageUri,
+          };
+          items.push(element.val());
+        });
+        setChatRoom(items);
+      });
+    // Stop listening for updates when no longer required
+    return () => database().ref(`/user/`);
+  }, []);
+  // console.log(chatRoom);
   const insertData = () => {
-    for (i = 0; i++; i <= DATA.length()) {
-      let item = DATA[i].id;
-      database().ref(`/users/${item}`).set({});
-    }
+    DATA.map((item) => {
+      database().ref(`/chatRoom/${user}/${item.id}`).set(item);
+    });
   };
   return (
     <View>
       <FlatList
-        data={DATA}
+        data={chatRoom}
         renderItem={({item}) => <ChatListItem chatRoom={item} />}
-        keyExtractor={(item) => item.id}></FlatList>
+        keyExtractor={(item) => item._key}></FlatList>
+      <TouchableOpacity onPress={() => insertData()}>
+        <Text>insertData</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 export default ChatRoomScreen;
-
-const Cat = () => {
-  console.log('I am Cat');
-  return (
-    <View>
-      <Text>I am also a cat!</Text>
-    </View>
-  );
-};

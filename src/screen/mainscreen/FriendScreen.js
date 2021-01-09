@@ -16,22 +16,23 @@ const FriendScreen = () => {
   const [addFriend, setAddFriend] = useState([]);
   const [friendList, setFriendList] = useState([]);
   const userId = auth().currentUser.uid;
-  // console.log(userId);
 
   useEffect(() => {
+    const user = 'PHS7Hirww6TPpb3AZmGTS4IfadW2';
     const onValueChange = database()
-      .ref(`/user/`)
+      .ref(`/users/`)
       .on('value', (snapshot) => {
         let items = [];
         snapshot.forEach((element) => {
+          console.log('Clg', element.val());
           let item = {
-            _key: element.key,
-            userName: element.val().userName,
-            email: element.val().email,
+            // _key: element.key,
+            // userName: element.val().userName,
+            // email: element.val().email,
           };
-          items.push(item);
+          // items.push(item);
         });
-        setFriendList(items);
+        // setFriendList(items);
       });
     // Stop listening for updates when no longer required
     return () => database().ref(`/user/`);
@@ -83,9 +84,15 @@ const FriendScreen = () => {
           </View>;
         })}
       </View> */}
+      <View style={styles.listFriend}>
+        <FlatList
+          data={addFriend}
+          renderItem={({item}) => <AddFriendList friendList={item} />}
+          keyExtractor={(item) => String(item._key)}></FlatList>
+      </View>
 
       <FlatList
-        data={addFriend}
+        data={friendList}
         renderItem={({item}) => <AddFriendList friendList={item} />}
         keyExtractor={(item) => String(item._key)}></FlatList>
     </View>
@@ -117,5 +124,8 @@ const styles = StyleSheet.create({
   addFriend: {
     flex: 1,
     backgroundColor: 'orange',
+  },
+  listFriend: {
+    marginVertical: 5,
   },
 });
