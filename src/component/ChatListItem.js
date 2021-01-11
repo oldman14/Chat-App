@@ -11,8 +11,8 @@ const ChatListItem = (props) => {
   const navigation = useNavigation();
   const onClick = () => {
     navigation.navigate('ChatScreen', {
-      id: props.chatRoom._key,
-      name: props.chatRoom.users.name,
+      idRoom: props.chatRoom.idChat,
+      name: props.chatRoom.name,
     });
   };
   return (
@@ -21,9 +21,9 @@ const ChatListItem = (props) => {
         <View style={styles.leftContainer}>
           <Image
             style={styles.imageUser}
-            source={{uri: props.chatRoom.user.imageUri}}></Image>
+            source={{uri: props.chatRoom.imageUri}}></Image>
           <View style={styles.midContainer}>
-            <Text style={styles.userName}>{props.chatRoom.user.name}</Text>
+            <Text style={styles.userName}>{props.chatRoom.name}</Text>
             <Text numberOfLines={1} style={styles.lastMessage}>
               {props.chatRoom.lastMessage.content}
             </Text>

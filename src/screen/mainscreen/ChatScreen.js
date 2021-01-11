@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {
   FlatList,
@@ -8,118 +8,72 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ChatNode from './ChatNode';
 import auth from '@react-native-firebase/auth';
-
-const ChatScreen = ({route}) => {
-  const dataMessages = {
-    id: '1',
-    users: [
-      {
-        id: 'u1',
-        name: 'Vadim',
-        imageUri:
-          'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/1.jpg',
-      },
-      {
-        id: 'u2',
-        name: 'Lukas',
-        imageUri:
-          'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/2.jpg',
-      },
-    ],
-    messages: [
-      {
-        id: 'm1',
-        content: 'How are you, Lukas!',
-        createdAt: '2020-12-29T12:48:00.000Z',
-        user: {
-          id: 'u1',
-          name: 'Vadim',
-        },
-      },
-      {
-        id: 'm2',
-        content: 'I am good, good',
-        createdAt: '2020-12-29T14:49:00.000Z',
-        user: {
-          id: 'u2',
-          name: 'Lukas',
-        },
-      },
-      {
-        id: 'm3',
-        content: 'What about you?',
-        createdAt: '2020-12-29T14:49:40.000Z',
-        user: {
-          id: 'u2',
-          name: 'Lukas',
-        },
-      },
-      {
-        id: 'm4',
-        content: 'Good as well, preparing for the stream now.',
-        createdAt: '2020-12-29T14:50:00.000Z',
-        user: {
-          id: 'u1',
-          name: 'Vadim',
-        },
-      },
-      {
-        id: 'm5',
-        content: 'How is your uni going?',
-        createdAt: '2020-12-29T14:51:00.000Z',
-        user: {
-          id: 'u1',
-          name: 'Vadim',
-        },
-      },
-      {
-        id: 'm6',
-        content:
-          'It is a bit tough, as I have 2 specializations. How about yours? Do you enjoy it?',
-        createdAt: '2020-12-29T14:49:00.000Z',
-        user: {
-          id: 'u2',
-          name: 'Lukas',
-        },
-      },
-      {
-        id: 'm7',
-        content:
-          'Big Data is really interesting. Cannot wait to go through all the material.',
-        createdAt: '2020-12-29T14:53:00.000Z',
-        user: {
-          id: 'u1',
-          name: 'Vadim',
-        },
-      },
-    ],
-  };
-
+import database from '@react-native-firebase/database';
+import {set} from 'react-native-reanimated';
+const ChatScreen = ({route, props}) => {
   const [messages, setMessages] = useState('');
-  const {id} = route.params;
+  const {idRoom, name} = route.params;
+  console.log(name);
+  const [chatData, setChatData] = useState([]);
   const user = auth().currentUser;
-  const userId = auth().currentUser.uid;
-  console.log(userId);
-  user.providerData.forEach((userInfo) => {
-    console.log('User info for provider: ', userInfo);
-  });
+  const [userData, setUserData] = useState();
+  useEffect(() => {
+    database()
+      .ref(`/dataChat/${idRoom}/messages/`)
+      .on('value', (snapshot) => {
+        let items = [];
+        snapshot.forEach((element) => {
+          let item = {
+            _key: element.key,
+            username: element.val().username,
+            uid: element.val().uid,
+            content: element.val().content,
+            createdAt: element.val().createdAt,
+          };
+          items.push(item);
+        });
+        setChatData(items);
+      });
+    return () => {};
+  }, []);
+  useEffect(() => {
+    database()
+      .ref(`/user/${user.uid}`)
+      .on('value', (snapshot) => {
+        setUserData(snapshot.val().userName);
+        console.log(snapshot.val().userName);
+      });
+
+    return () => {};
+  }, []);
+  console.log(userData); // user.providerData.forEach((userInfo) => {
+  //   console.log('User info for provider: ', userInfo);
+  // });
   const sendMessages = () => {
-    console.log(messages);
+    database().ref(`/dataChat/${idRoom}/messages/`).push({
+      username: userData,
+      content: messages,
+      uid: user.uid,
+      createdAt: '2020-12-29T12:48:00.000Z',
+    });
     setMessages('');
   };
   const isFillText = () => {
     return messages == '';
   };
+  // console.log("Chua dao mang: ",chatData);
+  // console.log("Chua dao mang: ",chatData);
+
   return (
     <View style={styles.container}>
       <View style={styles.chatContent}>
         <FlatList
-          data={dataMessages.messages}
-          keyExtractor={(item) => item.id}
-          renderItem={({item}) => <ChatNode message={item} />}
-          inverted></FlatList>
+          style={styles.flatlistStyle}
+          inverted
+          data={chatData.reverse()}
+          keyExtractor={(item) => item._key}
+          renderItem={({item}) => <ChatNode message={item} />}></FlatList>
       </View>
-
       <View style={styles.messageContainer}>
         <MaterialCommunityIcons
           style={styles.emoticon}
@@ -185,6 +139,9 @@ const styles = StyleSheet.create({
   chatContent: {
     flex: 1,
     backgroundColor: 'silver',
+  },
+  flatlistStyle: {
+    alignContent: 'flex-end',
   },
   imageIcon: {
     flexDirection: 'row',

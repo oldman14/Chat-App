@@ -1,12 +1,17 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import moment from 'moment';
+import auth from '@react-native-firebase/auth';
+import {useState} from 'react';
 
 const ChatNode = (props) => {
   const messages = props.message;
+  const currentUser = auth().currentUser.uid;
+  const [dataChat, setData] = useState();
   const isCheckUser = () => {
-    return messages.user.id == 'u1';
+    return messages.uid == currentUser;
   };
+
   return (
     <View style={styles.container}>
       <View
@@ -18,9 +23,7 @@ const ChatNode = (props) => {
             marginLeft: isCheckUser() ? 50 : 0,
           },
         ]}>
-        {!isCheckUser() && (
-          <Text style={styles.name}>{messages.user.name}</Text>
-        )}
+        {!isCheckUser() && <Text style={styles.name}>{messages.username}</Text>}
         <Text style={styles.content}>{messages.content}</Text>
         <Text style={styles.time}>
           {moment(messages.createdAt).startOf('day').fromNow()}
