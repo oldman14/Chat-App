@@ -20,19 +20,19 @@ const FriendScreen = () => {
   useEffect(() => {
     const user = 'PHS7Hirww6TPpb3AZmGTS4IfadW2';
     const onValueChange = database()
-      .ref(`/users/`)
+      .ref(`/user/`)
       .on('value', (snapshot) => {
         let items = [];
         snapshot.forEach((element) => {
           console.log('Clg', element.val());
           let item = {
-            // _key: element.key,
-            // userName: element.val().userName,
-            // email: element.val().email,
+            _key: element.key,
+            userName: element.val().userName,
+            email: element.val().email,
           };
-          // items.push(item);
+          items.push(item);
         });
-        // setFriendList(items);
+        setFriendList(items);
       });
     // Stop listening for updates when no longer required
     return () => database().ref(`/user/`);

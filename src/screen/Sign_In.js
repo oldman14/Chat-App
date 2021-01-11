@@ -10,33 +10,19 @@ import {AuthContext} from '../../src/navigatior/AuthProvider';
 export default function Login({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const {isAuth, setIsAuth} = useContext(AuthContext);
   // console.log(isAuth);
+  const {isAuth, setIsAuth} = useContext(AuthContext);
+
   const [initialRouteName, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  // const [user, setUser] = useState();
 
-  const onAuthStateChanged = (user) => {
-    setUser(user);
-    // console.log(user);
-    // console.log(user.email);
-    // if (initialRouteName) setInitializing(false);
-    if (!isAuth) setIsAuth(true);
-  };
-
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    // console.log(onAuthStateChanged);
-    return subscriber;
-  }, []);
-
-  if (isAuth) return null;
+  // if (isAuth) return null;
 
   const login = (email, password) => {
     auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
         setIsAuth(true);
-        // onAuthStateChanged();
         console.log('User account created & signed in!');
       })
       .catch((error) => {
