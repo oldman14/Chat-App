@@ -13,8 +13,11 @@ const ChatListItem = (props) => {
     navigation.navigate('ChatScreen', {
       idRoom: props.chatRoom.idChat,
       name: props.chatRoom.name,
+      guestId: props.chatRoom.guestId,
+      imageUri: props.chatRoom.imageUri,
     });
   };
+  console.log(props.chatRoom.idChat);
   return (
     <TouchableOpacity onPress={() => onClick()}>
       <View style={styles.container}>

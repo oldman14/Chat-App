@@ -3,33 +3,46 @@ import {View, Text, StyleSheet, Image} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
+import {useNavigation} from '@react-navigation/native';
 
 const AddFriendList = (props) => {
+  const navigation = useNavigation();
+
+  const onClick = () => {
+    navigation.navigate('ChatScreen', {
+      name: props.friendList.userName,
+      idRoom: props.friendList._key,
+      imageUri: props.friendList.imageUri,
+      guestId: props.friendList._key,
+    });
+  };
   const friendList = props.friendList;
   // console.log('Log add: ' + friendList);
-  const onClick = () => {
-    console.log(friendList.userName);
-  };
+  // const onClick = () => {
+  //   console.log(friendList.userName);
+  // };
   const url =
     'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/5.jpg';
   return (
     <View style={styles.container}>
-      <View style={styles.leftContainer}>
-        <Image style={styles.imageUser} source={{uri: url}}></Image>
-        <View style={styles.midContainer}>
-          <Text style={styles.userName}>{friendList.userName}</Text>
-          <Text>Đã gửi lời mời kết bạn</Text>
+      <TouchableOpacity onPress={() => onClick()}>
+        <View style={styles.leftContainer}>
+          <Image style={styles.imageUser} source={{uri: url}}></Image>
+          <View style={styles.midContainer}>
+            <Text style={styles.userName}>{friendList.userName}</Text>
+            <Text>Đã gửi lời mời kết bạn</Text>
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
 
-      <View style={styles.rightContainer}>
+      {/* <View style={styles.rightContainer}>
         <TouchableOpacity style={styles.cancelButton}>
           <Text>Hủy</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => onClick()} style={styles.acceptButton}>
           <Text>Đồng ý</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 };

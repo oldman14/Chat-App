@@ -8,9 +8,8 @@ import database from '@react-native-firebase/database';
 const ChatRoomScreen = ({navigation}) => {
   const [chatRoom, setChatRoom] = useState([]);
   const user = auth().currentUser.uid;
-
   useEffect(() => {
-    const onValueChange = database()
+    database()
       .ref(`/chatRoom/${user}/`)
       .on('value', (snapshot) => {
         let items = [];
@@ -21,13 +20,13 @@ const ChatRoomScreen = ({navigation}) => {
             name: element.val().user.name,
             imageUri: element.val().user.imageUri,
             lastMessage: element.val().lastMessage,
+            guestId: element.val().user.guestId,
           };
           items.push(item);
         });
         setChatRoom(items);
       });
     // Stop listening for updates when no longer required
-    return () => database().ref(`/user/`);
   }, []);
   return (
     <View>

@@ -12,14 +12,19 @@ import database from '@react-native-firebase/database';
 import {set} from 'react-native-reanimated';
 const ChatScreen = ({route, props}) => {
   const [messages, setMessages] = useState('');
-  const {idRoom, name} = route.params;
-  console.log(name);
+  const {idRoom, name, imageUri, guestId} = route.params;
+  console.log('CLg guestId', guestId);
   const [chatData, setChatData] = useState([]);
   const user = auth().currentUser;
-  const [userData, setUserData] = useState();
+  const [userData, setUserData] = useState([]);
+  if (user.uid > guestId) {
+    var idRoomNew = user.uid + guestId;
+  } else {
+    var idRoomNew = guestId + user.uid;
+  }
   useEffect(() => {
     database()
-      .ref(`/dataChat/${idRoom}/messages/`)
+      .ref(`/dataChat/${idRoomNew}/messages/`)
       .on('value', (snapshot) => {
         let items = [];
         snapshot.forEach((element) => {
@@ -37,32 +42,68 @@ const ChatScreen = ({route, props}) => {
     return () => {};
   }, []);
   useEffect(() => {
+    let items = [];
     database()
       .ref(`/user/${user.uid}`)
       .on('value', (snapshot) => {
-        setUserData(snapshot.val().userName);
-        console.log(snapshot.val().userName);
+        setUserData({
+          imageUri: snapshot.val().imageUri,
+          username: snapshot.val().userName,
+        });
       });
-
     return () => {};
   }, []);
-  console.log(userData); // user.providerData.forEach((userInfo) => {
-  //   console.log('User info for provider: ', userInfo);
-  // });
+  // const idRoomNew = () =>user.uid + guestId;
   const sendMessages = () => {
-    database().ref(`/dataChat/${idRoom}/messages/`).push({
-      username: userData,
+    database().ref(`/dataChat/${idRoomNew}/messages/`).push({
+      username: userData.username,
       content: messages,
       uid: user.uid,
       createdAt: '2020-12-29T12:48:00.000Z',
     });
     setMessages('');
+    sendLastMessages();
+    currentMess();
+  };
+  const sendLastMessages = () => {
+    database()
+      .ref(`/chatRoom/${guestId}/${user.uid}`)
+      .set({
+        lastMessage: {
+          username: userData.username,
+          content: messages,
+          uid: idRoom,
+          createdAt: '2020-12-29T12:48:00.000Z',
+        },
+        id: idRoomNew,
+        user: {
+          imageUri: userData.imageUri,
+          name: userData.username,
+          guestId: user.uid,
+        },
+      });
+  };
+  const currentMess = () => {
+    database()
+      .ref(`/chatRoom/${user.uid}/${guestId}`)
+      .set({
+        lastMessage: {
+          username: userData.username,
+          content: messages,
+          uid: user.uid,
+          createdAt: '2020-12-29T12:48:00.000Z',
+        },
+        id: idRoomNew,
+        user: {
+          imageUri: imageUri,
+          name: name,
+          guestId: guestId,
+        },
+      });
   };
   const isFillText = () => {
     return messages == '';
   };
-  // console.log("Chua dao mang: ",chatData);
-  // console.log("Chua dao mang: ",chatData);
 
   return (
     <View style={styles.container}>

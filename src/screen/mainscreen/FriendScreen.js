@@ -18,8 +18,7 @@ const FriendScreen = () => {
   const userId = auth().currentUser.uid;
 
   useEffect(() => {
-    const user = 'PHS7Hirww6TPpb3AZmGTS4IfadW2';
-    const onValueChange = database()
+    database()
       .ref(`/user/`)
       .on('value', (snapshot) => {
         let items = [];
@@ -29,6 +28,7 @@ const FriendScreen = () => {
             _key: element.key,
             userName: element.val().userName,
             email: element.val().email,
+            imageUri: element.val().imageUri,
           };
           items.push(item);
         });
@@ -53,12 +53,6 @@ const FriendScreen = () => {
     }
     setAddFriend(items);
   };
-  console.log(addFriend);
-  // const searchFriend = () => {
-  //   friendList.map((item) => {
-  //     console.log('item', item);
-  //   });
-  // };
 
   return (
     <View style={styles.container}>
